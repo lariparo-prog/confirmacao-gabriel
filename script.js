@@ -59,13 +59,25 @@ function processarConfirmacao() {
     }, 1200);
 }
 
-function gerarCodigo() {
-    let proximoNumero = Number(localStorage.getItem("proximoCodigo")) || 1;
-    let codigo = "G10-" + String(proximoNumero).padStart(3, "0");
+async function gerarCodigo() {
+    try {
+        const resposta = await fetch(API_URL + "?acao=listar");
+        const dados = await resposta.json();
 
-    localStorage.setItem("proximoCodigo", proximoNumero + 1);
+        let quantidadeConfirmacoes = 0;
 
-    return codigo;
+        if (dados.sucesso && dados.confirmacoes) {
+            quantidadeConfirmacoes = dados.confirmacoes.length;
+        }
+
+        let proximoNumero = quantidadeConfirmacoes + 1;
+
+        return "G10-" + String(proximoNumero).padStart(3, "0");
+
+    } catch (erro) {
+        let numeroEmergencia = Date.now().toString().slice(-3);
+        return "G10-" + numeroEmergencia;
+    }
 }
 
 function gerarLinkValidacao() {
@@ -92,7 +104,7 @@ function gerarQRCode() {
 }
 
 async function salvarConfirmacao() {
-    codigoConvidado = gerarCodigo();
+    codigoConvidado = await gerarCodigo();
 
     let confirmacao = {
         acao: "salvar",
