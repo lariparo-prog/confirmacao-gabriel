@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Presença</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<main class="story">
+
+    <div id="tela1" class="card">
+        <div class="topo">⭐</div>
+
+        <h1>Gabriel</h1>
+        <h2>10 anos</h2>
+
+        <p class="frase">
+            Você foi convocado para viver<br>
+            um dia inesquecível!
+        </p>
+
+        <input type="text" id="nome" placeholder="Seu nome completo">
+
+        <button onclick="irParaParticipantes()">
+            Confirmar Presença
+        </button>
+
+        <p class="toque">
+            🏆 Seu lugar no time está quase garantido!
+        </p>
+    </div>
+
+    <div id="tela2" class="card escondido animado">
+
+        <div class="topo">⚽</div>
+
+        <h3>Participantes</h3>
+
+        <p class="subtitulo">
+            Informe quantas pessoas comparecerão com você.
+        </p>
+
+        <div class="contador">
+            <span>Adultos</span>
+
+            <div class="controle">
+                <button class="botao-contador" onclick="diminuirAdultos()">−</button>
+                <strong id="adultos">1</strong>
+                <button class="botao-contador" onclick="aumentarAdultos()">+</button>
+            </div>
+        </div>
+
+        <div class="contador">
+            <span>Crianças</span>
+
+            <div class="controle">
+                <button class="botao-contador" onclick="diminuirCriancas()">−</button>
+                <strong id="criancas">0</strong>
+                <button class="botao-contador" onclick="aumentarCriancas()">+</button>
+            </div>
+        </div>
+
+        <button onclick="processarConfirmacao()">
+            Finalizar Confirmação
+        </button>
+
+    </div>
+
+    <div id="loading" class="card escondido animado">
+
+        <div class="bola-girando">⚽</div>
+
+        <h3>Processando convocação...</h3>
+
+        <p class="subtitulo">
+            Estamos garantindo seu lugar no time!
+        </p>
+
+    </div>
+
+    <div id="tela3" class="ticket final-card escondido animado">
+
+        <div class="ticket-picote ticket-picote-esquerda"></div>
+        <div class="ticket-picote ticket-picote-direita"></div>
+
+        <div class="ticket-topo">
+            <div class="ticket-label">⚽ INGRESSO OFICIAL</div>
+            <h3>Gabriel 10 anos</h3>
+            <p>Convocação especial</p>
+        </div>
+
+        <div class="ticket-info">
+            <span>CONVIDADO</span>
+            <strong id="nomeConfirmado"></strong>
+        </div>
+
+        <div class="resumo-final ticket-resumo" id="resumoFinal"></div>
+
+        <div class="ticket-linha pontilhada"></div>
+
+        <div class="qrcode ticket-qr">
+            <div id="qrImagem"></div>
+        </div>
+
+        <div class="codigo ticket-codigo">
+            🎟️ G10-001
+        </div>
+
+        <p class="aviso ticket-aviso">
+            Apresente este ingresso na entrada do evento.
+        </p>
+
+        <button class="botao-salvar ticket-botao" onclick="salvarComprovante()">
+            📱 Salvar Ingresso
+        </button>
+
+    </div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
