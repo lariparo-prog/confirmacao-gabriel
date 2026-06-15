@@ -4,80 +4,112 @@ let nomeConvidado = "";
 let quantidadeAdultos = 1;
 let quantidadeCriancas = 0;
 let codigoConvidado = "";
+let convidadoEscolhido = null;
+
+window.onload = function () {
+    const busca = document.getElementById("buscaNome");
+
+    if (busca) {
+        busca.addEventListener("input", buscarConvidados);
+    }
+};
 
 function mostrarTela(idTela) {
     document.getElementById("tela1").classList.add("escondido");
     document.getElementById("tela2").classList.add("escondido");
     document.getElementById("loading").classList.add("escondido");
     document.getElementById("tela3").classList.add("escondido");
+    document.getElementById("tela4").classList.add("escondido");
 
     document.getElementById(idTela).classList.remove("escondido");
 }
 
-function irParaParticipantes() {
-    let nome = document.getElementById("nome").value;
+async function buscarConvidados() {
+    const texto = document.getElementById("buscaNome").value.trim();
+    const area = document.getElementById("listaConvidados");
 
-    if (nome.trim() === "") {
-        alert("Digite seu nome para confirmar presença.");
+    area.innerHTML = "";
+
+    if (texto.length < 2) {
         return;
     }
 
-    nomeConvidado = nome.trim();
+    const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=" + encodeURIComponent(texto));
+    const dados = await resposta.json();
 
-    mostrarTela("tela2");
-}
-
-function aumentarAdultos() {
-    quantidadeAdultos++;
-    document.getElementById("adultos").innerHTML = quantidadeAdultos;
-}
-
-function diminuirAdultos() {
-    if (quantidadeAdultos > 1) {
-        quantidadeAdultos--;
-        document.getElementById("adultos").innerHTML = quantidadeAdultos;
+    if (!dados.sucesso || dados.convidados.length === 0) {
+        area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
+        return;
     }
+
+    dados.convidados.forEach(function (item) {
+        const botao = document.createElement("button");
+        botao.innerHTML = item.nome;
+        botao.onclick = function () {
+            escolherConvidado(item);
+        };
+
+        area.appendChild(botao);
+    });
 }
 
-function aumentarCriancas() {
-    quantidadeCriancas++;
-    document.getElementById("criancas").innerHTML = quantidadeCriancas;
+function escolherConvidado(item) {
+    convidadoEscolhido = item;
+
+    codigoConvidado = item.codigo;
+    nomeConvidado = item.nome;
+    quantidadeAdultos = Number(item.adultos) || 0;
+    quantidadeCriancas = Number(item.criancas) || 0;
+
+    document.getElementById("buscaNome").value = item.nome;
+    document.getElementById("listaConvidados").innerHTML = "";
+
+    const area = document.getElementById("convidadoSelecionado");
+
+    area.classList.remove("escondido");
+    area.innerHTML = `
+        <div class="contador">
+            <span>Convidado selecionado</span>
+            <strong style="color:#007a33; font-size:22px;">${item.nome}</strong>
+            <p class="subtitulo">
+                👨 Adultos: ${quantidadeAdultos}<br>
+                🧒 Crianças: ${quantidadeCriancas}
+            </p>
+        </div>
+    `;
 }
 
-function diminuirCriancas() {
-    if (quantidadeCriancas > 0) {
-        quantidadeCriancas--;
-        document.getElementById("criancas").innerHTML = quantidadeCriancas;
+function conferirConvidadoSelecionado() {
+    if (!convidadoEscolhido) {
+        alert("Digite seu nome e selecione um convidado da lista.");
+        return false;
     }
+
+    return true;
 }
 
 function processarConfirmacao() {
+    if (!conferirConvidadoSelecionado()) {
+        return;
+    }
+
     mostrarTela("loading");
 
     setTimeout(function () {
-        finalizarConfirmacao();
+        finalizarConfirmacao("confirmado");
     }, 1200);
 }
 
-async function gerarCodigo() {
-    try {
-        const resposta = await fetch(API_URL + "?acao=listar");
-        const dados = await resposta.json();
-
-        let quantidadeConfirmacoes = 0;
-
-        if (dados.sucesso && dados.confirmacoes) {
-            quantidadeConfirmacoes = dados.confirmacoes.length;
-        }
-
-        let proximoNumero = quantidadeConfirmacoes + 1;
-
-        return "G10-" + String(proximoNumero).padStart(3, "0");
-
-    } catch (erro) {
-        let numeroEmergencia = Date.now().toString().slice(-3);
-        return "G10-" + numeroEmergencia;
+function processarNaoComparecimento() {
+    if (!conferirConvidadoSelecionado()) {
+        return;
     }
+
+    mostrarTela("loading");
+
+    setTimeout(function () {
+        finalizarNaoComparecimento();
+    }, 1200);
 }
 
 function gerarLinkValidacao() {
@@ -103,9 +135,7 @@ function gerarQRCode() {
     });
 }
 
-async function salvarConfirmacao() {
-    codigoConvidado = await gerarCodigo();
-
+async function salvarConfirmacao(statusResposta) {
     let confirmacao = {
         acao: "salvar",
         nome: nomeConvidado,
@@ -113,7 +143,7 @@ async function salvarConfirmacao() {
         criancas: quantidadeCriancas,
         codigo: codigoConvidado,
         data: new Date().toLocaleString("pt-BR"),
-        status: "confirmado"
+        status: statusResposta
     };
 
     await fetch(API_URL, {
@@ -127,7 +157,7 @@ async function salvarConfirmacao() {
 }
 
 async function finalizarConfirmacao() {
-    await salvarConfirmacao();
+    await salvarConfirmacao("confirmado");
 
     mostrarTela("tela3");
 
@@ -146,6 +176,15 @@ async function finalizarConfirmacao() {
     document.querySelector(".codigo").innerHTML = "🎟️ " + codigoConvidado;
 
     gerarQRCode();
+}
+
+async function finalizarNaoComparecimento() {
+    await salvarConfirmacao("não comparecerá");
+
+    mostrarTela("tela4");
+
+    document.getElementById("nomeNaoVai").innerHTML =
+        nomeConvidado + "<br>Resposta: não comparecerá.";
 }
 
 function salvarComprovante() {
