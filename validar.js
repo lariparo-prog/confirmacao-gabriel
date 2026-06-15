@@ -1,35 +1,48 @@
-const parametros = new URLSearchParams(window.location.search);
+const API_URL = "https://script.google.com/macros/s/AKfycbykNrT7BkY_JRHqMD_yNKRFWnXgYWZjzTOiE8rB3CbneXwa7ljfTENWbQlhOWHzP8PB/exec";
 
+const parametros = new URLSearchParams(window.location.search);
 const codigoRecebido = parametros.get("codigo");
 
-const lista = JSON.parse(localStorage.getItem("confirmacoes")) || [];
+validarConvite();
 
-const indice = lista.findIndex(
-    item => item.codigo === codigoRecebido
-);
+async function validarConvite() {
 
-const convidado = lista[indice];
-
-if(convidado){
-
-    if(convidado.status === "utilizado"){
-
-        document.getElementById("status").innerHTML = "⚠️";
-
-        document.getElementById("titulo").innerHTML =
-            "QR já utilizado";
-
-        document.getElementById("nome").innerHTML =
-            convidado.nome;
-
-        document.getElementById("dados").innerHTML =
-            "Entrada já registrada.";
-
-        document.getElementById("codigo").innerHTML =
-            "🎟️ " + convidado.codigo;
-
+    if (!codigoRecebido) {
+        mostrarInvalido("Código não informado.");
+        return;
     }
-    else{
+
+    try {
+
+        const resposta = await fetch(
+            API_URL + "?acao=validar&codigo=" + encodeURIComponent(codigoRecebido)
+        );
+
+        const dados = await resposta.json();
+
+        if (!dados.sucesso) {
+            mostrarInvalido(dados.mensagem);
+            return;
+        }
+
+        if (dados.utilizado) {
+
+            document.getElementById("status").innerHTML = "⚠️";
+
+            document.getElementById("titulo").innerHTML =
+                "QR já utilizado";
+
+            document.getElementById("nome").innerHTML =
+                dados.nome;
+
+            document.getElementById("dados").innerHTML =
+                "Entrada já registrada.";
+
+            document.getElementById("codigo").innerHTML =
+                "🎟️ " + dados.codigo;
+
+            return;
+        }
 
         document.getElementById("status").innerHTML = "✅";
 
@@ -37,25 +50,32 @@ if(convidado){
             "Entrada liberada";
 
         document.getElementById("nome").innerHTML =
-            convidado.nome;
+            dados.nome;
 
         document.getElementById("dados").innerHTML =
-            "👨 Adultos: " + convidado.adultos + "<br>" +
-            "🧒 Crianças: " + convidado.criancas;
+            "👨 Adultos: " + dados.adultos + "<br>" +
+            "🧒 Crianças: " + dados.criancas;
 
         document.getElementById("codigo").innerHTML =
-            "🎟️ " + convidado.codigo;
+            "🎟️ " + dados.codigo;
 
-        lista[indice].status = "utilizado";
+    } catch (erro) {
 
-        localStorage.setItem(
-            "confirmacoes",
-            JSON.stringify(lista)
-        );
+        document.getElementById("status").innerHTML = "❌";
+
+        document.getElementById("titulo").innerHTML =
+            "Erro";
+
+        document.getElementById("nome").innerHTML = "";
+
+        document.getElementById("dados").innerHTML =
+            "Falha ao consultar a planilha.";
+
+        document.getElementById("codigo").innerHTML = "";
     }
-
 }
-else{
+
+function mostrarInvalido(mensagem) {
 
     document.getElementById("status").innerHTML = "❌";
 
@@ -65,7 +85,7 @@ else{
     document.getElementById("nome").innerHTML = "";
 
     document.getElementById("dados").innerHTML =
-        "Este código não foi encontrado na lista.";
+        mensagem;
 
     document.getElementById("codigo").innerHTML = "";
 }
