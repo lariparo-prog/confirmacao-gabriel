@@ -1,3 +1,5 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbykNrT7BkY_JRHqMD_yNKRFWnXgYWZjzTOiE8rB3CbneXwa7ljfTENWbQlhOWHzP8PB/exec";
+
 let nomeConvidado = "";
 let quantidadeAdultos = 1;
 let quantidadeCriancas = 0;
@@ -89,10 +91,11 @@ function gerarQRCode() {
     });
 }
 
-function salvarConfirmacao() {
+async function salvarConfirmacao() {
     codigoConvidado = gerarCodigo();
 
     let confirmacao = {
+        acao: "salvar",
         nome: nomeConvidado,
         adultos: quantidadeAdultos,
         criancas: quantidadeCriancas,
@@ -101,15 +104,18 @@ function salvarConfirmacao() {
         status: "confirmado"
     };
 
-    let lista = JSON.parse(localStorage.getItem("confirmacoes")) || [];
-
-    lista.push(confirmacao);
-
-    localStorage.setItem("confirmacoes", JSON.stringify(lista));
+    await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(confirmacao)
+    });
 }
 
-function finalizarConfirmacao() {
-    salvarConfirmacao();
+async function finalizarConfirmacao() {
+    await salvarConfirmacao();
 
     mostrarTela("tela3");
 
