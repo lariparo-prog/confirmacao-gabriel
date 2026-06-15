@@ -13,20 +13,28 @@
 <main class="story">
 
     <div id="tela1" class="card">
-        <div class="topo">⭐</div>
+        <div class="topo">🔎</div>
 
         <h1>Gabriel</h1>
         <h2>10 anos</h2>
 
         <p class="frase">
-            Você foi convocado para viver<br>
-            um dia inesquecível!
+            Encontre seu nome na lista<br>
+            para responder ao convite.
         </p>
 
-        <input type="text" id="nome" placeholder="Seu nome completo">
+        <input type="text" id="buscaNome" placeholder="Digite seu nome">
 
-        <button onclick="irParaParticipantes()">
+        <div id="listaConvidados"></div>
+
+        <div id="convidadoSelecionado" class="escondido"></div>
+
+        <button onclick="processarConfirmacao()">
             Confirmar Presença
+        </button>
+
+        <button onclick="processarNaoComparecimento()">
+            Não poderei comparecer
         </button>
 
         <p class="toque">
@@ -34,52 +42,16 @@
         </p>
     </div>
 
-    <div id="tela2" class="card escondido animado">
-
-        <div class="topo">⚽</div>
-
-        <h3>Participantes</h3>
-
-        <p class="subtitulo">
-            Informe quantas pessoas comparecerão com você.
-        </p>
-
-        <div class="contador">
-            <span>Adultos</span>
-
-            <div class="controle">
-                <button class="botao-contador" onclick="diminuirAdultos()">−</button>
-                <strong id="adultos">1</strong>
-                <button class="botao-contador" onclick="aumentarAdultos()">+</button>
-            </div>
-        </div>
-
-        <div class="contador">
-            <span>Crianças</span>
-
-            <div class="controle">
-                <button class="botao-contador" onclick="diminuirCriancas()">−</button>
-                <strong id="criancas">0</strong>
-                <button class="botao-contador" onclick="aumentarCriancas()">+</button>
-            </div>
-        </div>
-
-        <button onclick="processarConfirmacao()">
-            Finalizar Confirmação
-        </button>
-
-    </div>
+    <div id="tela2" class="card escondido animado"></div>
 
     <div id="loading" class="card escondido animado">
-
         <div class="bola-girando">⚽</div>
 
-        <h3>Processando convocação...</h3>
+        <h3>Processando...</h3>
 
         <p class="subtitulo">
-            Estamos garantindo seu lugar no time!
+            Estamos registrando sua resposta!
         </p>
-
     </div>
 
     <div id="tela3" class="ticket final-card escondido animado">
@@ -118,6 +90,18 @@
             📱 Salvar Ingresso
         </button>
 
+    </div>
+
+    <div id="tela4" class="card escondido animado">
+        <div class="topo">💙</div>
+
+        <h3>Resposta registrada</h3>
+
+        <p class="subtitulo">
+            Obrigado por avisar!
+        </p>
+
+        <p id="nomeNaoVai" class="frase"></p>
     </div>
 
 </main>
