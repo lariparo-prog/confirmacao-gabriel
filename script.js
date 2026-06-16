@@ -42,9 +42,18 @@ async function buscarConvidados() {
         return;
     }
 
+    const nomesJaMostrados = [];
+
     dados.convidados.forEach(function (item) {
+        if (nomesJaMostrados.includes(item.nome)) {
+            return;
+        }
+
+        nomesJaMostrados.push(item.nome);
+
         const botao = document.createElement("button");
         botao.innerHTML = item.nome;
+
         botao.onclick = function () {
             escolherConvidado(item);
         };
@@ -96,7 +105,7 @@ function processarConfirmacao() {
     mostrarTela("loading");
 
     setTimeout(function () {
-        finalizarConfirmacao("confirmado");
+        finalizarConfirmacao();
     }, 1200);
 }
 
