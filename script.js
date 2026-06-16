@@ -5,12 +5,19 @@ let quantidadeAdultos = 1;
 let quantidadeCriancas = 0;
 let codigoConvidado = "";
 let convidadoEscolhido = null;
+let tempoBusca = null;
 
 window.onload = function () {
     const busca = document.getElementById("buscaNome");
 
     if (busca) {
-        busca.addEventListener("input", buscarConvidados);
+        busca.addEventListener("input", function () {
+            clearTimeout(tempoBusca);
+
+            tempoBusca = setTimeout(function () {
+                buscarConvidados();
+            }, 400);
+        });
     }
 };
 
@@ -29,37 +36,51 @@ async function buscarConvidados() {
     const area = document.getElementById("listaConvidados");
 
     area.innerHTML = "";
+    convidadoEscolhido = null;
+
+    document.getElementById("convidadoSelecionado").classList.add("escondido");
+    document.getElementById("convidadoSelecionado").innerHTML = "";
 
     if (texto.length < 2) {
         return;
     }
 
-    const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=" + encodeURIComponent(texto));
-    const dados = await resposta.json();
+    try {
+        const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=" + encodeURIComponent(texto));
+        const dados = await resposta.json();
 
-    if (!dados.sucesso || dados.convidados.length === 0) {
-        area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
-        return;
-    }
-
-    const nomesJaMostrados = [];
-
-    dados.convidados.forEach(function (item) {
-        if (nomesJaMostrados.includes(item.nome)) {
+        if (!dados.sucesso || !dados.convidados || dados.convidados.length === 0) {
+            area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
             return;
         }
 
-        nomesJaMostrados.push(item.nome);
+        const convidadosUnicos = [];
+        const chaves = new Set();
 
-        const botao = document.createElement("button");
-        botao.innerHTML = item.nome;
+        dados.convidados.forEach(function (item) {
+            const chave = String(item.codigo || "") + "|" + String(item.nome || "").toLowerCase().trim();
 
-        botao.onclick = function () {
-            escolherConvidado(item);
-        };
+            if (!chaves.has(chave)) {
+                chaves.add(chave);
+                convidadosUnicos.push(item);
+            }
+        });
 
-        area.appendChild(botao);
-    });
+        convidadosUnicos.forEach(function (item) {
+            const botao = document.createElement("button");
+            botao.type = "button";
+            botao.innerHTML = item.nome;
+
+            botao.onclick = function () {
+                escolherConvidado(item);
+            };
+
+            area.appendChild(botao);
+        });
+
+    } catch (erro) {
+        area.innerHTML = "<p class='subtitulo'>Erro ao buscar convidados.</p>";
+    }
 }
 
 function escolherConvidado(item) {
