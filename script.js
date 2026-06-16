@@ -6,6 +6,7 @@ let quantidadeCriancas = 0;
 let codigoConvidado = "";
 let convidadoEscolhido = null;
 let tempoBusca = null;
+let numeroDaBusca = 0;
 
 window.onload = function () {
     const busca = document.getElementById("buscaNome");
@@ -16,7 +17,7 @@ window.onload = function () {
 
             tempoBusca = setTimeout(function () {
                 buscarConvidados();
-            }, 400);
+            }, 500);
         });
     }
 };
@@ -32,6 +33,7 @@ function mostrarTela(idTela) {
 }
 
 async function buscarConvidados() {
+    const buscaAtual = ++numeroDaBusca;
     const texto = document.getElementById("buscaNome").value.trim();
     const area = document.getElementById("listaConvidados");
 
@@ -49,24 +51,28 @@ async function buscarConvidados() {
         const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=" + encodeURIComponent(texto));
         const dados = await resposta.json();
 
+        if (buscaAtual !== numeroDaBusca) {
+            return;
+        }
+
+        area.innerHTML = "";
+
         if (!dados.sucesso || !dados.convidados || dados.convidados.length === 0) {
             area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
             return;
         }
 
-        const convidadosUnicos = [];
         const chaves = new Set();
 
         dados.convidados.forEach(function (item) {
-            const chave = String(item.codigo || "") + "|" + String(item.nome || "").toLowerCase().trim();
+            const chave = String(item.codigo || "").trim();
 
-            if (!chaves.has(chave)) {
-                chaves.add(chave);
-                convidadosUnicos.push(item);
+            if (chaves.has(chave)) {
+                return;
             }
-        });
 
-        convidadosUnicos.forEach(function (item) {
+            chaves.add(chave);
+
             const botao = document.createElement("button");
             botao.type = "button";
             botao.innerHTML = item.nome;
@@ -79,7 +85,9 @@ async function buscarConvidados() {
         });
 
     } catch (erro) {
-        area.innerHTML = "<p class='subtitulo'>Erro ao buscar convidados.</p>";
+        if (buscaAtual === numeroDaBusca) {
+            area.innerHTML = "<p class='subtitulo'>Erro ao buscar convidados.</p>";
+        }
     }
 }
 
