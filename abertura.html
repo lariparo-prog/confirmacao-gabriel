@@ -60,10 +60,6 @@ setTimeout(function(){
     document.getElementById("pular").style.display = "none";
 }, 6000);
 
-setTimeout(function(){
-    irParaConvite();
-}, 30000);
-</script>
-
-</body>
-</html>
+document.getElementById("video").addEventListener("ended", function(){
+irParaConvite();
+});
