@@ -5,22 +5,47 @@ let quantidadeAdultos = 1;
 let quantidadeCriancas = 0;
 let codigoConvidado = "";
 let convidadoEscolhido = null;
-let tempoBusca = null;
-let numeroDaBusca = 0;
+
+let listaConvidadosCompleta = [];
+let listaCarregada = false;
 
 window.onload = function () {
+    carregarConvidados();
+
     const busca = document.getElementById("buscaNome");
 
     if (busca) {
         busca.addEventListener("input", function () {
-            clearTimeout(tempoBusca);
-
-            tempoBusca = setTimeout(function () {
-                buscarConvidados();
-            }, 100);
+            buscarConvidados();
         });
     }
 };
+
+function normalizarTexto(texto) {
+    return String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+}
+
+async function carregarConvidados() {
+    const area = document.getElementById("listaConvidados");
+
+    try {
+        const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=");
+        const dados = await resposta.json();
+
+        if (dados.sucesso && dados.convidados) {
+            listaConvidadosCompleta = dados.convidados;
+            listaCarregada = true;
+        }
+    } catch (erro) {
+        if (area) {
+            area.innerHTML = "<p class='subtitulo'>Erro ao carregar lista.</p>";
+        }
+    }
+}
 
 function mostrarTela(idTela) {
     document.getElementById("tela1").classList.add("escondido");
@@ -32,8 +57,7 @@ function mostrarTela(idTela) {
     document.getElementById(idTela).classList.remove("escondido");
 }
 
-async function buscarConvidados() {
-    const buscaAtual = ++numeroDaBusca;
+function buscarConvidados() {
     const texto = document.getElementById("buscaNome").value.trim();
     const area = document.getElementById("listaConvidados");
 
@@ -47,48 +71,56 @@ async function buscarConvidados() {
         return;
     }
 
-    try {
-        const resposta = await fetch(API_URL + "?acao=buscarConvidados&nome=" + encodeURIComponent(texto));
-        const dados = await resposta.json();
-
-        if (buscaAtual !== numeroDaBusca) {
-            return;
-        }
-
-        area.innerHTML = "";
-
-        if (!dados.sucesso || !dados.convidados || dados.convidados.length === 0) {
-            area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
-            return;
-        }
-
-        const chaves = new Set();
-
-        dados.convidados.forEach(function (item) {
-            const chave = String(item.codigo || "").trim();
-
-            if (chaves.has(chave)) {
-                return;
-            }
-
-            chaves.add(chave);
-
-            const botao = document.createElement("button");
-            botao.type = "button";
-            botao.innerHTML = item.nome;
-
-            botao.onclick = function () {
-                escolherConvidado(item);
-            };
-
-            area.appendChild(botao);
-        });
-
-    } catch (erro) {
-        if (buscaAtual === numeroDaBusca) {
-            area.innerHTML = "<p class='subtitulo'>Erro ao buscar convidados.</p>";
-        }
+    if (!listaCarregada) {
+        area.innerHTML = "<p class='subtitulo'>Carregando lista...</p>";
+        return;
     }
+
+    const buscaNormalizada = normalizarTexto(texto);
+
+    let resultado = listaConvidadosCompleta.filter(function (item) {
+        return normalizarTexto(item.nome).includes(buscaNormalizada);
+    });
+
+    resultado.sort(function (a, b) {
+        const nomeA = normalizarTexto(a.nome);
+        const nomeB = normalizarTexto(b.nome);
+
+        const aComeca = nomeA.startsWith(buscaNormalizada);
+        const bComeca = nomeB.startsWith(buscaNormalizada);
+
+        if (aComeca && !bComeca) return -1;
+        if (!aComeca && bComeca) return 1;
+
+        return nomeA.localeCompare(nomeB);
+    });
+
+    if (resultado.length === 0) {
+        area.innerHTML = "<p class='subtitulo'>Nenhum convidado encontrado.</p>";
+        return;
+    }
+
+    const chaves = new Set();
+
+    resultado.forEach(function (item) {
+        const chave = String(item.codigo || "").trim();
+
+        if (chaves.has(chave)) {
+            return;
+        }
+
+        chaves.add(chave);
+
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.innerHTML = item.nome;
+
+        botao.onclick = function () {
+            escolherConvidado(item);
+        };
+
+        area.appendChild(botao);
+    });
 }
 
 function escolherConvidado(item) {
