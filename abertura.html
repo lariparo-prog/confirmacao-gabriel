@@ -18,16 +18,29 @@ body{
     width:100vw;
     height:100vh;
     overflow:hidden;
-    display:flex;
-    justify-content:center;
-    align-items:center;
 }
 
 #poster{
     width:100%;
     height:100%;
-    object-fit:contain;
+    object-fit:cover;
     cursor:pointer;
+    display:block;
+}
+
+#textoToque{
+    position:fixed;
+    bottom:95px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.65);
+    color:white;
+    padding:12px 22px;
+    border-radius:30px;
+    font-size:18px;
+    font-weight:bold;
+    z-index:10;
+    white-space:nowrap;
 }
 
 #video{
@@ -57,6 +70,8 @@ body{
 
 <img id="poster" src="poster.jpeg">
 
+<div id="textoToque">⚽ Toque no selo para abrir</div>
+
 <video id="video" playsinline>
     <source src="abertura.mp4" type="video/mp4">
 </video>
@@ -64,19 +79,16 @@ body{
 <button id="pular">⏭️ Pular abertura</button>
 
 <script>
-
 const poster = document.getElementById("poster");
+const textoToque = document.getElementById("textoToque");
 const video = document.getElementById("video");
 const pular = document.getElementById("pular");
 
 function abrirVideo(){
-
     poster.style.display = "none";
-
+    textoToque.style.display = "none";
     video.style.display = "block";
-
     pular.style.display = "block";
-
     video.play();
 }
 
@@ -85,11 +97,9 @@ function irParaConvite(){
 }
 
 poster.addEventListener("click", abrirVideo);
-
+textoToque.addEventListener("click", abrirVideo);
 pular.addEventListener("click", irParaConvite);
-
 video.addEventListener("ended", irParaConvite);
-
 </script>
 
 </body>
