@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sugestões de Presentes</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    position:relative;
+}
+
+.imagem{
+    width:100%;
+    display:block;
+}
+
+.fechar{
+    position:fixed;
+    top:10px;
+    right:10px;
+    width:45px;
+    height:45px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+    z-index:999;
+}
+
+.pix{
+    position:absolute;
+    top:60%;
+    left:8%;
+    width:84%;
+    height:14%;
+    cursor:pointer;
+}
+
+.mensagem{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#16a34a;
+    color:white;
+    padding:12px 20px;
+    border-radius:10px;
+    font-weight:bold;
+    display:none;
+    z-index:9999;
+}
+</style>
+</head>
+
+<body>
+
+<button class="fechar" onclick="window.location.href='convite.html'">
+✕
+</button>
+
+<img src="presentes.png" class="imagem">
+
+<div class="pix" onclick="copiarPix()"></div>
+
+<div class="mensagem" id="msg">
+✅ Chave Pix copiada!
+</div>
+
+<script>
+function copiarPix(){
+
+    navigator.clipboard.writeText("+5517991445659");
+
+    const msg = document.getElementById("msg");
+    msg.style.display = "block";
+
+    setTimeout(()=>{
+        msg.style.display = "none";
+    },2000);
+}
+</script>
+
+</body>
+</html>
