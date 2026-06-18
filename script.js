@@ -17,7 +17,7 @@ window.onload = function () {
 
             tempoBusca = setTimeout(function () {
                 buscarConvidados();
-            }, 500);
+            }, 100);
         });
     }
 };
@@ -43,7 +43,7 @@ async function buscarConvidados() {
     document.getElementById("convidadoSelecionado").classList.add("escondido");
     document.getElementById("convidadoSelecionado").innerHTML = "";
 
-    if (texto.length < 2) {
+    if (texto.length < 1) {
         return;
     }
 
