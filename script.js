@@ -259,9 +259,10 @@ async function finalizarNaoComparecimento() {
 
 function salvarComprovante() {
     let comprovante = document.getElementById("tela3");
-    let botaoSalvar = document.querySelector(".botao-salvar");
-
-    botaoSalvar.style.display = "none";
+    let botaoSalvar = document.querySelectorAll (".botao-salvar");
+    botaoSalvar.forEach(function(botao) {
+    botao.style.display = "none";
+      }};
     comprovante.classList.remove("animado");
 
     let areaExportacao = document.createElement("div");
