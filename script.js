@@ -267,6 +267,20 @@ function salvarComprovante() {
 
     comprovante.classList.remove("animado");
 
+    let estiloOriginal = {
+        width: comprovante.style.width,
+        maxWidth: comprovante.style.maxWidth,
+        minHeight: comprovante.style.minHeight,
+        transform: comprovante.style.transform,
+        margin: comprovante.style.margin
+    };
+
+    comprovante.style.width = "340px";
+    comprovante.style.maxWidth = "340px";
+    comprovante.style.minHeight = "610px";
+    comprovante.style.transform = "none";
+    comprovante.style.margin = "0 auto";
+
     let areaExportacao = document.createElement("div");
 
     areaExportacao.style.width = "420px";
@@ -298,6 +312,12 @@ function salvarComprovante() {
             marcador.parentNode.insertBefore(comprovante, marcador);
             marcador.remove();
             areaExportacao.remove();
+
+            comprovante.style.width = estiloOriginal.width;
+            comprovante.style.maxWidth = estiloOriginal.maxWidth;
+            comprovante.style.minHeight = estiloOriginal.minHeight;
+            comprovante.style.transform = estiloOriginal.transform;
+            comprovante.style.margin = estiloOriginal.margin;
 
             botoesSalvar.forEach(function(botao) {
                 botao.style.display = "block";
