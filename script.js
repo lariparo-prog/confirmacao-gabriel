@@ -268,7 +268,7 @@ function salvarComprovante() {
 
     areaExportacao.style.width = "420px";
     areaExportacao.style.minHeight = "760px";
-    areaExportacao.style.padding = "36px 26px";
+    areaExportacao.style.padding = "70px 26px 36x";
     areaExportacao.style.background = "linear-gradient(90deg,#0b8b2f 0%,#f3df3d 50%,#0f6ec9 100%)";
     areaExportacao.style.display = "flex";
     areaExportacao.style.justifyContent = "center";
