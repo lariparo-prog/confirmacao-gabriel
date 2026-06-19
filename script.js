@@ -259,17 +259,19 @@ async function finalizarNaoComparecimento() {
 
 function salvarComprovante() {
     let comprovante = document.getElementById("tela3");
-    let botaoSalvar = document.querySelectorAll (".botao-salvar");
-    botaoSalvar.forEach(function(botao) {
-    botao.style.display = "none";
-      }};
+    let botoesSalvar = document.querySelectorAll(".botao-salvar");
+
+    botoesSalvar.forEach(function(botao) {
+        botao.style.display = "none";
+    });
+
     comprovante.classList.remove("animado");
 
     let areaExportacao = document.createElement("div");
 
     areaExportacao.style.width = "420px";
     areaExportacao.style.minHeight = "760px";
-    areaExportacao.style.padding = "70px 26px 36x";
+    areaExportacao.style.padding = "70px 26px 36px";
     areaExportacao.style.background = "linear-gradient(90deg,#0b8b2f 0%,#f3df3d 50%,#0f6ec9 100%)";
     areaExportacao.style.display = "flex";
     areaExportacao.style.justifyContent = "center";
@@ -287,32 +289,34 @@ function salvarComprovante() {
             useCORS: true,
             backgroundColor: null
         }).then(function (canvas) {
-           canvas.toBlob(async function(blob) {
-    const arquivo = new File(
-        [blob],
-        "comprovante-" + codigoConvidado + ".png",
-        { type: "image/png" }
-    );
+            canvas.toBlob(async function(blob) {
+                const arquivo = new File(
+                    [blob],
+                    "comprovante-" + codigoConvidado + ".png",
+                    { type: "image/png" }
+                );
 
-    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-        await navigator.share({
-            files: [arquivo],
-            title: "Ingresso Gabriel 10 anos",
-            text: "Meu ingresso do aniversário do Gabriel."
-        });
-    } else {
-        let link = document.createElement("a");
-        link.download = "comprovante-" + codigoConvidado + ".png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    }
-}, "image/png");
+                if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                    await navigator.share({
+                        files: [arquivo],
+                        title: "Ingresso Gabriel 10 anos",
+                        text: "Meu ingresso do aniversário do Gabriel."
+                    });
+                } else {
+                    let link = document.createElement("a");
+                    link.download = "comprovante-" + codigoConvidado + ".png";
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                }
+            }, "image/png");
 
             marcador.parentNode.insertBefore(comprovante, marcador);
             marcador.remove();
             areaExportacao.remove();
 
-            botaoSalvar.style.display = "block";
+            botoesSalvar.forEach(function(botao) {
+                botao.style.display = "block";
+            });
 
             alert("Comprovante salvo com sucesso! ⚽");
         });
