@@ -289,26 +289,11 @@ function salvarComprovante() {
             useCORS: true,
             backgroundColor: null
         }).then(function (canvas) {
-            canvas.toBlob(async function(blob) {
-                const arquivo = new File(
-                    [blob],
-                    "comprovante-" + codigoConvidado + ".png",
-                    { type: "image/png" }
-                );
+            let link = document.createElement("a");
 
-                if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-                    await navigator.share({
-                        files: [arquivo],
-                        title: "Ingresso Gabriel 10 anos",
-                        text: "Meu ingresso do aniversário do Gabriel."
-                    });
-                } else {
-                    let link = document.createElement("a");
-                    link.download = "comprovante-" + codigoConvidado + ".png";
-                    link.href = canvas.toDataURL("image/png");
-                    link.click();
-                }
-            }, "image/png");
+            link.download = "comprovante-" + codigoConvidado + ".png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
 
             marcador.parentNode.insertBefore(comprovante, marcador);
             marcador.remove();
@@ -317,8 +302,6 @@ function salvarComprovante() {
             botoesSalvar.forEach(function(botao) {
                 botao.style.display = "block";
             });
-
-            alert("Comprovante salvo com sucesso! ⚽");
         });
     }, 500);
 }
