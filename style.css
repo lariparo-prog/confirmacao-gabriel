@@ -224,10 +224,7 @@ h3{
 }
 
 .ticket-linha.pontilhada{
-    height:0;
-    border-top:3px dashed #d4af37;
-    background:transparent;
-    margin:16px 0;
+    display:none;
 }
 
 .ticket-info{
